@@ -68,7 +68,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, company, location, url, description, salary } = body;
+    const { 
+      title, 
+      company, 
+      location, 
+      url, 
+      description, 
+      salary,
+      excitement,
+      deadline,
+      platform,
+      resumeImage,
+      resumeImagePublicId,
+    } = body;
 
     // Validate required fields
     if (!title || !company || !location) {
@@ -89,7 +101,11 @@ export async function POST(request: NextRequest) {
       description,
       salary,
       status: 'bookmarked',
-      excitement: 3,
+      excitement: excitement || 3,
+      deadline: deadline || undefined,
+      platform: platform || 'linkedin',
+      resumeImage: resumeImage || undefined,
+      resumeImagePublicId: resumeImagePublicId || undefined,
       dateSaved: new Date(),
       checklistProgress: {
         bookmarked: 0,
