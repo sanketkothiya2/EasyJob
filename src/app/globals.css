@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --pink-primary: #FF6B9D;
+  --pink-secondary: #C44569;
+  --pink-light: #FFE4EC;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-pink text-white font-medium py-2.5 px-5 rounded-lg 
+           shadow-pink hover:shadow-pink-lg transition-all duration-200 
+           hover:scale-[1.02] active:scale-[0.98];
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-pink-600 font-medium py-2.5 px-5 rounded-lg 
+           border border-pink-200 hover:bg-pink-50 transition-all duration-200;
+  }
+  
+  .btn-outline {
+    @apply bg-transparent text-pink-600 font-medium py-2.5 px-5 rounded-lg 
+           border-2 border-pink-500 hover:bg-pink-500 hover:text-white 
+           transition-all duration-200;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg 
+           focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent
+           transition-all duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-pink-500 to-pink-700 bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
