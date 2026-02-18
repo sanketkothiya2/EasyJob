@@ -11,8 +11,8 @@ import {
   Star,
 } from 'lucide-react';
 import { Job, JobStatus } from '@/types';
-import Badge from '@/components/ui/Badge';
-import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
+import StatusDropdown from '@/components/ui/StatusDropdown';
+import { formatDate } from '@/lib/utils';
 
 interface JobTableProps {
   jobs: Job[];
@@ -23,18 +23,6 @@ interface JobTableProps {
   sortOrder: 'asc' | 'desc';
   onSortChange: (field: 'dateSaved' | 'company' | 'excitement') => void;
 }
-
-const statusOptions: { value: JobStatus; label: string }[] = [
-  { value: 'bookmarked', label: 'Bookmarked' },
-  { value: 'applying', label: 'Applying' },
-  { value: 'applied', label: 'Applied' },
-  { value: 'interviewing', label: 'Interviewing' },
-  { value: 'negotiating', label: 'Negotiating' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'no_response', label: 'No Response' },
-];
 
 export default function JobTable({
   jobs,
@@ -120,23 +108,10 @@ export default function JobTable({
 
             {/* Status */}
             <div className="col-span-2 flex items-center">
-              <select
+              <StatusDropdown
                 value={job.status}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  onStatusChange(job._id, e.target.value as JobStatus);
-                }}
-                onClick={(e) => e.stopPropagation()}
-                className={`text-xs px-2 py-1 rounded-full border-0 cursor-pointer ${getStatusColor(
-                  job.status
-                )}`}
-              >
-                {statusOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(status) => onStatusChange(job._id, status)}
+              />
             </div>
 
             {/* Date Saved */}

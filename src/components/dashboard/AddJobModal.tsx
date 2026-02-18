@@ -112,14 +112,14 @@ export default function AddJobModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           />
 
           {/* Modal */}
@@ -127,7 +127,7 @@ export default function AddJobModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg bg-white rounded-2xl shadow-2xl z-50 overflow-hidden max-h-[90vh] flex flex-col"
+            className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-500 to-rose-500 flex-shrink-0">
@@ -210,17 +210,25 @@ export default function AddJobModal({
                   </label>
                   <div className="flex gap-2">
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={formData.salaryMin}
-                      onChange={(e) => handleInputChange('salaryMin', e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        handleInputChange('salaryMin', value);
+                      }}
                       placeholder="Min"
                       className="flex-1"
                     />
                     <span className="flex items-center text-gray-400">to</span>
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={formData.salaryMax}
-                      onChange={(e) => handleInputChange('salaryMax', e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        handleInputChange('salaryMax', value);
+                      }}
                       placeholder="Max"
                       className="flex-1"
                     />
@@ -298,7 +306,7 @@ export default function AddJobModal({
               </div>
             </form>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );

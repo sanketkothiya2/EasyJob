@@ -6,7 +6,7 @@ import Providers from "@/components/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "JobTracker - Track Your Dream Job Applications",
+  title: "EasyJob - Track Your Dream Job Applications",
   description: "Organize, track, and land your dream job with our beautiful job tracking platform.",
   icons: {
     icon: "/images/logo/logo.png",

@@ -23,7 +23,8 @@ import { Job, JobStatus, Note, Contact } from '@/types';
 import Tabs from '@/components/ui/Tabs';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
+import StatusDropdown from '@/components/ui/StatusDropdown';
+import { formatDate } from '@/lib/utils';
 
 interface JobDetailPanelProps {
   job: Job;
@@ -31,18 +32,6 @@ interface JobDetailPanelProps {
   onUpdate: (jobId: string, updates: Partial<Job>) => void;
   onDelete: (jobId: string) => void;
 }
-
-const statusOptions: { value: JobStatus; label: string }[] = [
-  { value: 'bookmarked', label: 'Bookmarked' },
-  { value: 'applying', label: 'Applying' },
-  { value: 'applied', label: 'Applied' },
-  { value: 'interviewing', label: 'Interviewing' },
-  { value: 'negotiating', label: 'Negotiating' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'no_response', label: 'No Response' },
-];
 
 export default function JobDetailPanel({
   job,
@@ -110,25 +99,10 @@ export default function JobDetailPanel({
       {/* Header */}
       <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-6 text-white">
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <select
-              value={job.status}
-              onChange={(e) =>
-                onUpdate(job._id, { status: e.target.value as JobStatus })
-              }
-              className={`text-sm px-3 py-1 rounded-full bg-white/20 text-white border-0 cursor-pointer`}
-            >
-              {statusOptions.map((option) => (
-                <option
-                  key={option.value}
-                  value={option.value}
-                  className="text-gray-800"
-                >
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <StatusDropdown
+            value={job.status}
+            onChange={(status) => onUpdate(job._id, { status })}
+          />
           <button
             onClick={onClose}
             className="p-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"

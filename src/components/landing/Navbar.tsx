@@ -24,12 +24,12 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/images/logo/logo.png"
-              alt="JobTracker"
+              alt="EasyJob"
               width={40}
               height={40}
               className="rounded-lg"
             />
-            <span className="text-xl font-bold gradient-text">JobTracker</span>
+            <span className="text-xl font-bold gradient-text">EasyJob</span>
           </Link>
 
           {/* Desktop Navigation */}

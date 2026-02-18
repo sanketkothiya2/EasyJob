@@ -55,12 +55,12 @@ export default function LoginPage() {
             <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/images/logo/logo.png"
-                alt="JobTracker"
+                alt="EasyJob"
                 width={48}
                 height={48}
                 className="rounded-xl"
               />
-              <span className="text-2xl font-bold gradient-text">JobTracker</span>
+              <span className="text-2xl font-bold gradient-text">EasyJob</span>
             </Link>
           </div>
 

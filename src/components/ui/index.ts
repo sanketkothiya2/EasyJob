@@ -6,3 +6,4 @@ export { default as Badge } from './Badge';
 export { default as StarRating } from './StarRating';
 export { default as Pipeline, MiniPipeline, stages } from './Pipeline';
 export { default as Tabs, TabPanel } from './Tabs';
+export { default as StatusDropdown } from './StatusDropdown';

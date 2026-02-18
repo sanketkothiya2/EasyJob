@@ -87,7 +87,7 @@ export default function Pipeline({
   className,
 }: PipelineProps) {
   return (
-    <div className={cn('flex items-center gap-2 overflow-x-auto pb-2', className)}>
+    <div className={cn('flex items-center gap-2 overflow-x-auto p-2 -m-2', className)}>
       {stages.map((stage, index) => {
         const stageData = stagesWithCounts.find((s) => s.id === stage.id);
         const count = stageData?.count || 0;

@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui';
 
 export default function Hero() {
+  const { data: session } = useSession();
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-pink-50 via-white to-purple-50 pt-16">
       {/* Background Decorations */}
@@ -60,17 +62,19 @@ export default function Hero() {
               transition={{ delay: 0.5 }}
               className="flex flex-wrap gap-4"
             >
-              <Link href="/register">
+              <Link href={session ? "/dashboard" : "/register"}>
                 <Button size="lg" className="gap-2">
-                  Get Started Free
+                  {session ? 'Go to Dashboard' : 'Get Started Free'}
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button variant="secondary" size="lg">
-                  Sign In
-                </Button>
-              </Link>
+              {!session && (
+                <Link href="/login">
+                  <Button variant="secondary" size="lg">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </motion.div>
 
             {/* Stats */}
