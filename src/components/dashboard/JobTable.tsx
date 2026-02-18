@@ -9,6 +9,7 @@ import {
   ExternalLink,
   MoreHorizontal,
   Star,
+  Building2,
 } from 'lucide-react';
 import { Job, JobStatus } from '@/types';
 import StatusDropdown from '@/components/ui/StatusDropdown';
@@ -48,37 +49,47 @@ export default function JobTable({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-soft border border-gray-100 overflow-hidden">
-      {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100 text-sm font-medium text-gray-500">
-        <div className="col-span-4">Job</div>
-        <div
-          className="col-span-2 flex items-center gap-1 cursor-pointer hover:text-pink-500 transition-colors"
+    <div className="space-y-3">
+      {/* Sort Controls */}
+      <div className="flex items-center gap-4 px-2 text-sm">
+        <span className="text-gray-500">Sort by:</span>
+        <button
+          onClick={() => onSortChange('dateSaved')}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-all ${
+            sortBy === 'dateSaved' 
+              ? 'bg-pink-100 text-pink-600' 
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          Date
+          <SortIcon field="dateSaved" />
+        </button>
+        <button
           onClick={() => onSortChange('company')}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-all ${
+            sortBy === 'company' 
+              ? 'bg-pink-100 text-pink-600' 
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
         >
           Company
           <SortIcon field="company" />
-        </div>
-        <div className="col-span-2">Status</div>
-        <div
-          className="col-span-2 flex items-center gap-1 cursor-pointer hover:text-pink-500 transition-colors"
-          onClick={() => onSortChange('dateSaved')}
-        >
-          Date Saved
-          <SortIcon field="dateSaved" />
-        </div>
-        <div
-          className="col-span-1 flex items-center gap-1 cursor-pointer hover:text-pink-500 transition-colors"
+        </button>
+        <button
           onClick={() => onSortChange('excitement')}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-all ${
+            sortBy === 'excitement' 
+              ? 'bg-pink-100 text-pink-600' 
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
         >
           <Star className="w-4 h-4" />
           <SortIcon field="excitement" />
-        </div>
-        <div className="col-span-1"></div>
+        </button>
       </div>
 
-      {/* Table Body */}
-      <div className="divide-y divide-gray-50">
+      {/* Job Cards */}
+      <div className="space-y-3">
         {jobs.map((job, index) => (
           <motion.div
             key={job._id}
@@ -86,73 +97,83 @@ export default function JobTable({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: index * 0.03 }}
             onClick={() => onSelectJob(job)}
-            className={`grid grid-cols-12 gap-4 px-6 py-4 cursor-pointer transition-all ${
+            className={`bg-white rounded-xl border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-md ${
               selectedJobId === job._id
-                ? 'bg-pink-50 border-l-4 border-pink-500'
-                : 'hover:bg-gray-50'
+                ? 'border-pink-400 shadow-md bg-pink-50/50'
+                : 'border-gray-100 hover:border-pink-200'
             }`}
           >
-            {/* Job Title & Location */}
-            <div className="col-span-4">
-              <h3 className="font-medium text-gray-900 truncate">{job.title}</h3>
-              <div className="flex items-center gap-1 text-sm text-gray-500 mt-0.5">
-                <MapPin className="w-3 h-3" />
-                <span className="truncate">{job.location}</span>
+            {/* Top Row: Title & Status */}
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 truncate text-lg">
+                  {job.title}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-1.5 text-gray-600">
+                    <Building2 className="w-4 h-4 text-pink-400" />
+                    <span className="font-medium">{job.company}</span>
+                  </div>
+                  <span className="text-gray-300">•</span>
+                  <div className="flex items-center gap-1 text-gray-500 text-sm">
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span className="truncate">{job.location}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Actions */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {job.url && (
+                  <a
+                    href={job.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-all"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-all"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
-            {/* Company */}
-            <div className="col-span-2 flex items-center">
-              <span className="text-gray-700 truncate">{job.company}</span>
-            </div>
-
-            {/* Status */}
-            <div className="col-span-2 flex items-center">
-              <StatusDropdown
-                value={job.status}
-                onChange={(status) => onStatusChange(job._id, status)}
-              />
-            </div>
-
-            {/* Date Saved */}
-            <div className="col-span-2 flex items-center text-sm text-gray-500">
-              <Calendar className="w-3 h-3 mr-1" />
-              {formatDate(job.dateSaved)}
-            </div>
-
-            {/* Excitement */}
-            <div className="col-span-1 flex items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-3.5 h-3.5 ${
-                    i < job.excitement
-                      ? 'text-yellow-400 fill-yellow-400'
-                      : 'text-gray-200'
-                  }`}
+            {/* Bottom Row: Status, Date, Stars */}
+            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+              <div onClick={(e) => e.stopPropagation()}>
+                <StatusDropdown
+                  value={job.status}
+                  onChange={(status) => onStatusChange(job._id, status)}
                 />
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="col-span-1 flex items-center justify-end gap-2">
-              {job.url && (
-                <a
-                  href={job.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-1 text-gray-400 hover:text-pink-500 transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              )}
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="p-1 text-gray-400 hover:text-pink-500 transition-colors"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {/* Date */}
+                <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>{formatDate(job.dateSaved)}</span>
+                </div>
+                
+                {/* Stars */}
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${
+                        i < job.excitement
+                          ? 'text-yellow-400 fill-yellow-400'
+                          : 'text-gray-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.div>
         ))}

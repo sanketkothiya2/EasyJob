@@ -10,6 +10,19 @@ export type JobStatus =
   | 'rejected'
   | 'no_response';
 
+// Job Platform Types
+export type JobPlatform =
+  | 'linkedin'
+  | 'indeed'
+  | 'monster'
+  | 'glassdoor'
+  | 'ziprecruiter'
+  | 'dice'
+  | 'angellist'
+  | 'company_website'
+  | 'referral'
+  | 'other';
+
 // Note Types
 export type NoteType = 'general' | 'interview' | 'research' | 'follow_up';
 
@@ -58,6 +71,9 @@ export interface Job {
   deadline?: Date;
   followUpDate?: Date;
   checklistProgress: ChecklistProgress;
+  resumeImage?: string;
+  resumeImagePublicId?: string;
+  platform?: JobPlatform;
   createdAt: Date;
   updatedAt: Date;
   archivedAt?: Date;

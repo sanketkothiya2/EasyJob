@@ -107,3 +107,66 @@ export async function POST(
     );
   }
 }
+
+// DELETE /api/jobs/[id]/notes - Delete a note
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const noteId = searchParams.get('noteId');
+
+    if (!noteId) {
+      return NextResponse.json(
+        { error: 'Note ID is required' },
+        { status: 400 }
+      );
+    }
+
+    await dbConnect();
+
+    // Verify job belongs to user
+    const job = await Job.findOne({
+      _id: params.id,
+      userId: session.user.id,
+    });
+
+    if (!job) {
+      return NextResponse.json(
+        { error: 'Job not found' },
+        { status: 404 }
+      );
+    }
+
+    const note = await Note.findOneAndDelete({
+      _id: noteId,
+      jobId: params.id,
+      userId: session.user.id,
+    });
+
+    if (!note) {
+      return NextResponse.json(
+        { error: 'Note not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting note:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete note' },
+      { status: 500 }
+    );
+  }
+}

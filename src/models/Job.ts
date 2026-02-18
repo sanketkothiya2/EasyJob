@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { JobStatus, SalaryRange, ChecklistProgress } from '@/types';
+import { JobStatus, JobPlatform, SalaryRange, ChecklistProgress } from '@/types';
 
 export interface IJob extends Document {
   _id: mongoose.Types.ObjectId;
@@ -20,6 +20,9 @@ export interface IJob extends Document {
   deadline?: Date;
   followUpDate?: Date;
   checklistProgress: ChecklistProgress;
+  resumeImage?: string;
+  resumeImagePublicId?: string;
+  platform?: JobPlatform;
   createdAt: Date;
   updatedAt: Date;
   archivedAt?: Date;
@@ -108,6 +111,30 @@ const JobSchema = new Schema<IJob>(
       interviewing: { type: Number, default: 0 },
       negotiating: { type: Number, default: 0 },
       accepted: { type: Number, default: 0 },
+    },
+    resumeImage: {
+      type: String,
+      trim: true,
+    },
+    resumeImagePublicId: {
+      type: String,
+      trim: true,
+    },
+    platform: {
+      type: String,
+      enum: [
+        'linkedin',
+        'indeed',
+        'monster',
+        'glassdoor',
+        'ziprecruiter',
+        'dice',
+        'angellist',
+        'company_website',
+        'referral',
+        'other',
+      ],
+      default: 'linkedin',
     },
     archivedAt: Date,
   },
