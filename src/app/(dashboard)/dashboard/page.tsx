@@ -189,8 +189,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
-      {/* Header */}
+    <div className="h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 flex flex-col overflow-hidden">
+      {/* Header - Fixed */}
       <DashboardHeader
         userName={session?.user?.name || 'User'}
         onAddJob={() => setIsAddModalOpen(true)}
@@ -199,70 +199,99 @@ export default function DashboardPage() {
         onSearchChange={setSearchQuery}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Pipeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <Pipeline
-            stages={pipelineWithCounts}
-            selectedStatus={selectedStatus}
-            onStageClick={(status) =>
-              setSelectedStatus(status === selectedStatus ? 'all' : status)
-            }
-          />
-        </motion.div>
-
-        {/* Main Content */}
-        <div className="flex gap-6">
-          {/* Job Table */}
+      {/* Fixed Top Section */}
+      <div className="flex-shrink-0 bg-gradient-to-br from-pink-50 via-white to-rose-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4">
+          {/* Pipeline */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className={`flex-1 ${selectedJob ? 'hidden lg:block' : ''}`}
+            transition={{ duration: 0.5 }}
           >
-            {filteredJobs.length > 0 ? (
-              <JobTable
-                jobs={filteredJobs}
-                selectedJobId={selectedJob?._id}
-                onSelectJob={(job: Job) => setSelectedJob(job)}
-                onStatusChange={handleStatusChange}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
-                onSortChange={(field: 'dateSaved' | 'company' | 'excitement') => {
-                  if (sortBy === field) {
-                    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                  } else {
-                    setSortBy(field);
-                    setSortOrder('desc');
-                  }
-                }}
-              />
-            ) : (
-              <EmptyState
-                hasJobs={jobs.length > 0}
-                onAddJob={() => setIsAddModalOpen(true)}
-              />
-            )}
+            <Pipeline
+              stages={pipelineWithCounts}
+              selectedStatus={selectedStatus}
+              onStageClick={(status) =>
+                setSelectedStatus(status === selectedStatus ? 'all' : status)
+              }
+            />
           </motion.div>
-
-          {/* Job Detail Panel */}
-          <AnimatePresence>
-            {selectedJob && (
-              <JobDetailPanel
-                job={selectedJob}
-                onClose={() => setSelectedJob(null)}
-                onUpdate={handleUpdateJob}
-                onDelete={handleDeleteJob}
-              />
-            )}
-          </AnimatePresence>
         </div>
-      </main>
+      </div>
+
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          {/* Main Content */}
+          <div className="flex gap-6 h-full">
+            {/* Job Table - Scrollable */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className={`flex-1 flex flex-col min-h-0 ${selectedJob ? 'hidden lg:flex' : ''}`}
+            >
+              {/* Jobs Count Header */}
+              <div className="flex items-center justify-between py-3 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {selectedStatus === 'all' ? 'All Jobs' : pipelineStages.find(s => s.id === selectedStatus)?.label || 'Jobs'}
+                  </h2>
+                  <span className="px-3 py-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium rounded-full">
+                    {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'}
+                  </span>
+                  {jobs.length !== filteredJobs.length && (
+                    <span className="text-sm text-gray-500">
+                      of {jobs.length} total
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Scrollable Job List */}
+              <div className="flex-1 overflow-y-auto pb-6 min-h-0 custom-scrollbar">
+                {filteredJobs.length > 0 ? (
+                  <JobTable
+                    jobs={filteredJobs}
+                    selectedJobId={selectedJob?._id}
+                    onSelectJob={(job: Job) => setSelectedJob(job)}
+                    onStatusChange={handleStatusChange}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSortChange={(field: 'dateSaved' | 'company' | 'excitement') => {
+                      if (sortBy === field) {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortBy(field);
+                        setSortOrder('desc');
+                      }
+                    }}
+                  />
+                ) : (
+                  <EmptyState
+                    hasJobs={jobs.length > 0}
+                    onAddJob={() => setIsAddModalOpen(true)}
+                  />
+                )}
+              </div>
+            </motion.div>
+
+            {/* Job Detail Panel */}
+            <AnimatePresence>
+              {selectedJob && (
+                <div className="flex-shrink-0 overflow-y-auto custom-scrollbar pb-6">
+                  <JobDetailPanel
+                    job={selectedJob}
+                    onClose={() => setSelectedJob(null)}
+                    onUpdate={handleUpdateJob}
+                    onDelete={handleDeleteJob}
+                  />
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
 
       {/* Add Job Modal */}
       <AddJobModal

@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronUp,
   ChevronDown,
@@ -10,6 +11,11 @@ import {
   MoreHorizontal,
   Star,
   Building2,
+  Eye,
+  Trash2,
+  Archive,
+  Copy,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { Job, JobStatus } from '@/types';
 import StatusDropdown from '@/components/ui/StatusDropdown';
@@ -34,6 +40,40 @@ export default function JobTable({
   sortOrder,
   onSortChange,
 }: JobTableProps) {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleMenuAction = (action: string, job: Job, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenMenuId(null);
+    
+    switch (action) {
+      case 'view':
+        onSelectJob(job);
+        break;
+      case 'copy-link':
+        if (job.url) {
+          navigator.clipboard.writeText(job.url);
+        }
+        break;
+      case 'archive':
+        onStatusChange(job._id, 'withdrawn');
+        break;
+    }
+  };
+
   const SortIcon = ({
     field,
   }: {
@@ -131,16 +171,65 @@ export default function JobTable({
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-all"
+                    title="Open job listing"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
                 )}
-                <button
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-all"
-                >
-                  <MoreHorizontal className="w-4 h-4" />
-                </button>
+                <div className="relative" ref={openMenuId === job._id ? menuRef : null}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenuId(openMenuId === job._id ? null : job._id);
+                    }}
+                    className={`p-2 rounded-lg transition-all ${
+                      openMenuId === job._id
+                        ? 'text-pink-500 bg-pink-50'
+                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
+                    }`}
+                    title="More options"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  <AnimatePresence>
+                    {openMenuId === job._id && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 overflow-hidden"
+                      >
+                        <button
+                          onClick={(e) => handleMenuAction('view', job, e)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>View Details</span>
+                        </button>
+                        {job.url && (
+                          <button
+                            onClick={(e) => handleMenuAction('copy-link', job, e)}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
+                          >
+                            <Copy className="w-4 h-4" />
+                            <span>Copy Job URL</span>
+                          </button>
+                        )}
+                        <div className="h-px bg-gray-100 my-1" />
+                        <button
+                          onClick={(e) => handleMenuAction('archive', job, e)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Archive className="w-4 h-4" />
+                          <span>Archive Job</span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
 
