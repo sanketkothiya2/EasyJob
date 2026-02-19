@@ -25,6 +25,7 @@ const pipelineStages: PipelineStage[] = [
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   
   const [jobs, setJobs] = useState<Job[]>([]);

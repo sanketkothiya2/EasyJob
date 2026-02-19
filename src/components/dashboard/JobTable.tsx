@@ -12,10 +12,8 @@ import {
   Star,
   Building2,
   Eye,
-  Trash2,
   Archive,
   Copy,
-  Link as LinkIcon,
 } from 'lucide-react';
 import { Job, JobStatus } from '@/types';
 import StatusDropdown from '@/components/ui/StatusDropdown';

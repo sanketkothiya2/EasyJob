@@ -9,27 +9,24 @@ import {
   Star,
   Calendar,
   DollarSign,
-  Briefcase,
   Building2,
   Trash2,
-  Edit2,
   FileText,
   Users,
   CheckSquare,
   Clock,
-  Link as LinkIcon,
   Plus,
   Send,
   Mail,
-  Phone,
   Linkedin,
   Check,
   MessageSquare,
   UserPlus,
   Globe,
   Image as ImageIcon,
+  Link as LinkIcon,
 } from 'lucide-react';
-import { Job, JobStatus, JobPlatform, Note, Contact } from '@/types';
+import { Job, Note, Contact } from '@/types';
 
 // Platform display info
 const platformInfo: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -44,8 +41,6 @@ const platformInfo: Record<string, { label: string; color: string; bgColor: stri
   referral: { label: 'Referral', color: 'text-amber-600', bgColor: 'bg-amber-50' },
   other: { label: 'Other', color: 'text-gray-600', bgColor: 'bg-gray-50' },
 };
-import Tabs from '@/components/ui/Tabs';
-import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import StatusDropdown from '@/components/ui/StatusDropdown';
 import { formatDate } from '@/lib/utils';
@@ -101,6 +96,7 @@ export default function JobDetailPanel({
     fetchNotes();
     fetchContacts();
     fetchChecklist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job._id]);
 
   const fetchNotes = async () => {
@@ -512,6 +508,7 @@ export default function JobDetailPanel({
                   rel="noopener noreferrer"
                   className="block rounded-xl overflow-hidden border border-gray-200 hover:border-pink-300 transition-colors"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={job.resumeImage}
                     alt="Resume screenshot"
@@ -745,7 +742,7 @@ export default function JobDetailPanel({
                 <Users className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                 <p>No contacts yet</p>
                 <p className="text-sm">
-                  Add recruiters or interviewers you've connected with
+                  Add recruiters or interviewers you&apos;ve connected with
                 </p>
               </div>
             ) : (

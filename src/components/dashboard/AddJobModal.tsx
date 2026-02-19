@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Job, JobStatus, JobPlatform } from '@/types';
+import { Job, JobPlatform } from '@/types';
 
 // Platform options with icons and colors
 const platformOptions: { value: JobPlatform; label: string; color: string; bgColor: string }[] = [
@@ -151,7 +151,8 @@ export default function AddJobModal({
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     const items = e.clipboardData?.items;
     if (items) {
-      for (const item of items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
         if (item.type.startsWith('image/')) {
           const file = item.getAsFile();
           if (file) {
@@ -517,6 +518,7 @@ export default function AddJobModal({
                     </div>
                   ) : (
                     <div className="relative rounded-xl overflow-hidden border border-gray-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={resumeImage}
                         alt="Resume screenshot"

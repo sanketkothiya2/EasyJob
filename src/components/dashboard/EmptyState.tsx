@@ -26,7 +26,7 @@ export default function EmptyState({ hasJobs, onAddJob }: EmptyStateProps) {
           No matching jobs found
         </h3>
         <p className="text-gray-500 max-w-sm mx-auto">
-          Try adjusting your search or filter criteria to find what you're looking
+          Try adjusting your search or filter criteria to find what you&apos;re looking
           for.
         </p>
       </motion.div>
