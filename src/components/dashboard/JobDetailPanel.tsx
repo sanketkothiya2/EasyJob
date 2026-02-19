@@ -293,11 +293,11 @@ export default function JobDetailPanel({
   const completedCount = checklist.filter(item => item.completed).length;
   const totalCount = checklist.length;
 
-  const tabs = [
+  const tabs: { id: string; label: string; icon: typeof FileText; count?: number; badge?: string }[] = [
     { id: 'details', label: 'Details', icon: FileText },
     { id: 'notes', label: 'Notes', icon: FileText, count: notes.length },
     { id: 'contacts', label: 'Contacts', icon: Users, count: contacts.length },
-    { id: 'checklist', label: 'Checklist', icon: CheckSquare, count: totalCount > 0 ? `${completedCount}/${totalCount}` : undefined },
+    { id: 'checklist', label: 'Checklist', icon: CheckSquare, count: totalCount, badge: totalCount > 0 ? `${completedCount}/${totalCount}` : undefined },
   ];
 
   const noteTypeColors = {
@@ -374,7 +374,11 @@ export default function JobDetailPanel({
             >
               <span className="flex items-center justify-center gap-1">
                 {tab.label}
-                {tab.count !== undefined && tab.count > 0 && (
+                {tab.badge ? (
+                  <span className="text-xs bg-pink-100 text-pink-600 px-1.5 py-0.5 rounded-full">
+                    {tab.badge}
+                  </span>
+                ) : tab.count !== undefined && tab.count > 0 && (
                   <span className="text-xs bg-pink-100 text-pink-600 px-1.5 py-0.5 rounded-full">
                     {tab.count}
                   </span>
