@@ -190,3 +190,46 @@ export interface EmailTemplate {
   body: string;
   stage: JobStatus;
 }
+
+// Resource Types
+export type ResourceType = 'link' | 'image' | 'note';
+
+// Resource Interface
+export interface Resource {
+  _id: string;
+  userId: string;
+  type: ResourceType;
+  title: string;
+  content?: string;
+  url?: string;
+  thumbnail?: string;
+  description?: string;
+  siteName?: string;
+  category?: string;
+  categoryData?: Category;
+  tags: string[];
+  isFavorite: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Category Interface
+export interface Category {
+  _id: string;
+  userId: string;
+  name: string;
+  color: string;
+  icon: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Link Preview Data
+export interface LinkPreview {
+  url: string;
+  title?: string;
+  description?: string;
+  thumbnail?: string;
+  siteName?: string;
+  favicon?: string;
+}
