@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -40,7 +39,6 @@ const defaultStatuses = [
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   
   const [activeSection, setActiveSection] = useState<SettingsSection>('profile');
   const [isLoading, setIsLoading] = useState(false);
