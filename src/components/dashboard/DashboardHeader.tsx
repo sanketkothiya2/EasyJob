@@ -87,7 +87,7 @@ export default function DashboardHeader({
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 ml-4">
             {/* Add Job Button */}
             <Button onClick={onAddJob} className="hidden sm:flex">
               <Plus className="w-4 h-4 mr-2" />

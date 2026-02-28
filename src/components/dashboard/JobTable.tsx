@@ -24,6 +24,7 @@ interface JobTableProps {
   selectedJobId?: string;
   onSelectJob: (job: Job) => void;
   onStatusChange: (jobId: string, status: JobStatus) => void;
+  onDelete: (jobId: string) => void;
   sortBy: 'dateSaved' | 'company' | 'excitement';
   sortOrder: 'asc' | 'desc';
   onSortChange: (field: 'dateSaved' | 'company' | 'excitement') => void;
@@ -34,6 +35,7 @@ export default function JobTable({
   selectedJobId,
   onSelectJob,
   onStatusChange,
+  onDelete,
   sortBy,
   sortOrder,
   onSortChange,
@@ -67,7 +69,9 @@ export default function JobTable({
         }
         break;
       case 'archive':
-        onStatusChange(job._id, 'withdrawn');
+        if (confirm('Are you sure you want to archive this job? This action cannot be undone.')) {
+          onDelete(job._id);
+        }
         break;
     }
   };
