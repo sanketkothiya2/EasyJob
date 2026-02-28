@@ -257,6 +257,7 @@ export default function DashboardPage() {
                     selectedJobId={selectedJob?._id}
                     onSelectJob={(job: Job) => setSelectedJob(job)}
                     onStatusChange={handleStatusChange}
+                    onDelete={handleDeleteJob}
                     sortBy={sortBy}
                     sortOrder={sortOrder}
                     onSortChange={(field: 'dateSaved' | 'company' | 'excitement') => {
