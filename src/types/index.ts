@@ -233,3 +233,68 @@ export interface LinkPreview {
   siteName?: string;
   favicon?: string;
 }
+
+// Task Types
+export type TaskCategory = 'daily' | 'weekly' | 'monthly';
+export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskStatus = 'todo' | 'in_progress' | 'done';
+
+// Subtask Interface
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+// Scheduled Time
+export interface ScheduledTime {
+  start: string;
+  end: string;
+}
+
+// Task Interface
+export interface Task {
+  _id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  category: TaskCategory;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDate?: Date;
+  scheduledTime?: ScheduledTime;
+  tags: string[];
+  subtasks: Subtask[];
+  completedAt?: Date;
+  reminderAt?: Date;
+  isRecurring: boolean;
+  recurringPattern?: 'daily' | 'weekly' | 'monthly';
+  linkedJobId?: string;
+  linkedJob?: Job;
+  color?: string;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Task Input Types
+export interface CreateTaskInput {
+  title: string;
+  description?: string;
+  category?: TaskCategory;
+  priority?: TaskPriority;
+  dueDate?: Date;
+  scheduledTime?: ScheduledTime;
+  tags?: string[];
+  subtasks?: Subtask[];
+  reminderAt?: Date;
+  isRecurring?: boolean;
+  recurringPattern?: 'daily' | 'weekly' | 'monthly';
+  linkedJobId?: string;
+  color?: string;
+}
+
+export interface UpdateTaskInput extends Partial<CreateTaskInput> {
+  status?: TaskStatus;
+  order?: number;
+}

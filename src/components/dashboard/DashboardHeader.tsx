@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
 import {
@@ -15,25 +16,36 @@ import {
   Download,
   BookOpen,
   Briefcase,
+  ListTodo,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 interface DashboardHeaderProps {
-  userName: string;
-  onAddJob: () => void;
-  onExport: () => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
+  userName?: string;
+  onAddJob?: () => void;
+  onExport?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  showSearch?: boolean;
+  showAddJob?: boolean;
+  showExport?: boolean;
 }
 
 export default function DashboardHeader({
-  userName,
+  userName = 'User',
   onAddJob,
   onExport,
-  searchQuery,
+  searchQuery = '',
   onSearchChange,
 }: DashboardHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navTabs = [
+    { href: '/dashboard', label: 'Jobs', icon: Briefcase },
+    { href: '/tasks', label: 'Tasks', icon: ListTodo },
+    { href: '/resources', label: 'Resources', icon: BookOpen },
+  ];
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-pink-100 sticky top-0 z-40">
@@ -54,56 +66,67 @@ export default function DashboardHeader({
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search jobs..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
-              />
+          {onSearchChange && (
+            <div className="hidden md:flex flex-1 max-w-md mx-4">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search jobs..."
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation Tabs */}
           <nav className="hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-white text-pink-600 shadow-sm"
-            >
-              <Briefcase className="w-4 h-4" />
-              Jobs
-            </Link>
-            <Link
-              href="/resources"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-gray-600 hover:text-pink-600 hover:bg-white/50 transition-colors"
-            >
-              <BookOpen className="w-4 h-4" />
-              Resources
-            </Link>
+            {navTabs.map((tab) => {
+              const isActive = pathname === tab.href || (tab.href !== '/dashboard' && pathname.startsWith(tab.href));
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                    isActive
+                      ? 'bg-white text-pink-600 shadow-sm'
+                      : 'text-gray-600 hover:text-pink-600 hover:bg-white/50'
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-4 ml-4">
             {/* Add Job Button */}
-            <Button onClick={onAddJob} className="hidden sm:flex">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Job
-            </Button>
-            <Button onClick={onAddJob} className="sm:hidden p-2" aria-label="Add Job">
-              <Plus className="w-5 h-5" />
-            </Button>
+            {onAddJob && (
+              <>
+                <Button onClick={onAddJob} className="hidden sm:flex">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Job
+                </Button>
+                <Button onClick={onAddJob} className="sm:hidden p-2" aria-label="Add Job">
+                  <Plus className="w-5 h-5" />
+                </Button>
+              </>
+            )}
 
             {/* Export Button */}
-            <button
-              onClick={onExport}
-              className="p-2 text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors"
-              title="Export data"
-            >
-              <Download className="w-5 h-5" />
-            </button>
+            {onExport && (
+              <button
+                onClick={onExport}
+                className="p-2 text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors"
+                title="Export data"
+              >
+                <Download className="w-5 h-5" />
+              </button>
+            )}
 
             {/* Profile Dropdown */}
             <div className="relative">
@@ -139,6 +162,13 @@ export default function DashboardHeader({
                     >
                       <User className="w-4 h-4" />
                       Profile
+                    </Link>
+                    <Link
+                      href="/tasks"
+                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors lg:hidden"
+                    >
+                      <ListTodo className="w-4 h-4" />
+                      Tasks
                     </Link>
                     <Link
                       href="/resources"
