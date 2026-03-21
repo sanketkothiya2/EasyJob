@@ -19,6 +19,7 @@ import {
   ListTodo,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface DashboardHeaderProps {
   userName?: string;
@@ -82,16 +83,16 @@ export default function DashboardHeader({
           )}
 
           {/* Navigation Tabs */}
-          <nav className="hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+          <nav className="dashboard-nav hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
             {navTabs.map((tab) => {
               const isActive = pathname === tab.href || (tab.href !== '/dashboard' && pathname.startsWith(tab.href));
               return (
                 <Link
                   key={tab.href}
                   href={tab.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  className={`dashboard-nav-tab flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                     isActive
-                      ? 'bg-white text-pink-600 shadow-sm'
+                      ? 'dashboard-nav-tab-active bg-white text-pink-600 shadow-sm'
                       : 'text-gray-600 hover:text-pink-600 hover:bg-white/50'
                   }`}
                 >
@@ -104,6 +105,8 @@ export default function DashboardHeader({
 
           {/* Actions */}
           <div className="flex items-center gap-4 ml-4">
+            <ThemeToggle />
+
             {/* Add Job Button */}
             {onAddJob && (
               <>

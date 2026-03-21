@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -56,6 +57,8 @@ export default function Navbar() {
                 />
               </span>
             </Link>
+
+            <ThemeToggle />
             
             {session ? (
               <Link href="/dashboard">
@@ -92,6 +95,9 @@ export default function Navbar() {
           className="md:hidden bg-white border-t"
         >
           <div className="px-4 py-4 space-y-3">
+            <div className="flex justify-end">
+              <ThemeToggle />
+            </div>
             <Link
               href="#features"
               className="block text-gray-600 hover:text-pink-600 py-2"

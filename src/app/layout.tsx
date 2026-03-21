@@ -19,7 +19,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+  try {
+    const theme = localStorage.getItem('easyjob-theme') || 'light';
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  } catch (e) {}
+})();`,
+          }}
+        />
+      </head>
       <body className={`${inter.className} antialiased`}>
         <Providers>{children}</Providers>
       </body>
