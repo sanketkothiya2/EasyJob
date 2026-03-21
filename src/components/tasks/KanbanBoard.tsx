@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Circle,
   Clock,
@@ -89,9 +89,17 @@ export default function KanbanBoard({
     dragTaskRef.current = task;
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
+    
+    // Prevent text selection during drag
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    
+    // Set drag image to the element itself
+    const element = e.target as HTMLElement;
+    e.dataTransfer.setDragImage(element, element.offsetWidth / 2, 20);
+    
     // Add a delay to show the dragging state
     setTimeout(() => {
-      const element = e.target as HTMLElement;
       element.style.opacity = '0.5';
     }, 0);
   };
@@ -102,6 +110,10 @@ export default function KanbanBoard({
     setDraggedTask(null);
     setDragOverColumn(null);
     dragTaskRef.current = null;
+    
+    // Re-enable text selection
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
   };
 
   const handleDragOver = (e: React.DragEvent, status: TaskStatus) => {
@@ -142,7 +154,7 @@ export default function KanbanBoard({
   };
 
   return (
-    <div className="flex gap-6 overflow-x-auto pb-4">
+    <div className={`flex gap-6 overflow-x-auto pb-4 ${draggedTask ? 'select-none' : ''}`}>
       {columns.map((column) => {
         const columnTasks = getTasksByStatus(column.id);
         const isDropTarget = dragOverColumn === column.id && draggedTask?.status !== column.id;
@@ -181,16 +193,19 @@ export default function KanbanBoard({
 
               {/* Tasks */}
               <div className="space-y-3">
+                <AnimatePresence mode="popLayout">
                 {columnTasks.map((task) => (
                   <motion.div
                     key={task._id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    layoutId={task._id}
+                    initial={false}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
                     draggable
                     onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, task)}
                     onDragEnd={(e) => handleDragEnd(e as unknown as React.DragEvent)}
-                    className={`group bg-white border border-gray-200 rounded-xl p-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
+                    className={`group bg-white border border-gray-200 rounded-xl p-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow select-none ${
                       draggedTask?._id === task._id ? 'opacity-50' : ''
                     } ${isOverdue(task) ? 'border-l-4 border-l-red-500' : ''}`}
                   >
@@ -311,6 +326,7 @@ export default function KanbanBoard({
                     )}
                   </motion.div>
                 ))}
+                </AnimatePresence>
 
                 {/* Empty State */}
                 {columnTasks.length === 0 && (

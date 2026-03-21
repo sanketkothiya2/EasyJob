@@ -83,15 +83,21 @@ export async function GET(request: NextRequest) {
 
     // Calculate stats
     const allTasks = await Task.find({ userId: session.user.id }).lean();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
     const stats = {
       total: allTasks.length,
       todo: allTasks.filter(t => t.status === 'todo').length,
       inProgress: allTasks.filter(t => t.status === 'in_progress').length,
-      done: allTasks.filter(t => t.status === 'done').length,
+      completed: allTasks.filter(t => t.status === 'done').length,
       daily: allTasks.filter(t => t.category === 'daily').length,
       weekly: allTasks.filter(t => t.category === 'weekly').length,
       monthly: allTasks.filter(t => t.category === 'monthly').length,
       overdue: allTasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'done').length,
+      today: allTasks.filter(t => t.dueDate && new Date(t.dueDate) >= today && new Date(t.dueDate) < tomorrow).length,
     };
 
     return NextResponse.json({ tasks: transformedTasks, stats });

@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
-import Image from 'next/image';
 import {
   Plus,
   Search,
@@ -18,12 +16,12 @@ import {
   Loader2,
   Trash2,
   BookOpen,
-  Briefcase,
   X,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ResourceCard from '@/components/resources/ResourceCard';
 import AddResourceModal from '@/components/resources/AddResourceModal';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Resource, Category, ResourceType } from '@/types';
 
 const typeFilters: { type: ResourceType | 'all'; label: string; icon: typeof LinkIcon }[] = [
@@ -228,71 +226,40 @@ export default function ResourcesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-pink-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <Image
-                src="/images/logo/logo.png"
-                alt="EasyJob"
-                width={36}
-                height={36}
-                className="rounded-lg"
-              />
-              <span className="font-bold text-xl bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
-                EasyJob
-              </span>
-            </Link>
-
-            {/* Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search resources..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Navigation Tabs */}
-            <nav className="hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-gray-600 hover:text-pink-600 hover:bg-white/50 transition-colors"
-              >
-                <Briefcase className="w-4 h-4" />
-                Jobs
-              </Link>
-              <Link
-                href="/resources"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm bg-white text-pink-600 shadow-sm"
-              >
-                <BookOpen className="w-4 h-4" />
-                Resources
-              </Link>
-            </nav>
-
-            {/* Add Resource Button */}
-            <Button
-              onClick={() => {
-                setEditingResource(null);
-                setIsModalOpen(true);
-              }}
-              className="ml-4"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Resource
-            </Button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader userName={session?.user?.name || 'User'} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Page Title & Action */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Resources</h1>
+            <p className="text-gray-500">Your saved links, images, and notes</p>
+          </div>
+          <Button
+            onClick={() => {
+              setEditingResource(null);
+              setIsModalOpen(true);
+            }}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Resource
+          </Button>
+        </div>
+
+        {/* Search Bar (Mobile) */}
+        <div className="md:hidden mb-4">
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search resources..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+            />
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {[

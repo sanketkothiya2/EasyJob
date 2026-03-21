@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -41,6 +42,7 @@ interface TaskStats {
 }
 
 export default function TasksPage() {
+  const { data: session } = useSession();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stats, setStats] = useState<TaskStats>({
     total: 0,
@@ -264,7 +266,7 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <DashboardHeader />
+      <DashboardHeader userName={session?.user?.name || 'User'} />
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Page Header */}
