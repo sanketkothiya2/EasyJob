@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -83,6 +83,45 @@ export default function AddJobModal({
   // Platform state
   const [platform, setPlatform] = useState<JobPlatform>(editingJob?.platform || 'linkedin');
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (editingJob) {
+      setFormData({
+        title: editingJob.title || '',
+        company: editingJob.company || '',
+        location: editingJob.location || '',
+        url: editingJob.url || '',
+        description: editingJob.description || '',
+        salaryMin: editingJob.salary?.min ? String(editingJob.salary.min) : '',
+        salaryMax: editingJob.salary?.max ? String(editingJob.salary.max) : '',
+        deadline: editingJob.deadline ? new Date(editingJob.deadline).toISOString().split('T')[0] : '',
+      });
+      setExcitement(editingJob.excitement || 3);
+      setResumeImage(editingJob.resumeImage || null);
+      setResumeImagePublicId(editingJob.resumeImagePublicId || null);
+      setPlatform(editingJob.platform || 'linkedin');
+      setErrors({});
+      return;
+    }
+
+    setFormData({
+      title: '',
+      company: '',
+      location: '',
+      url: '',
+      description: '',
+      salaryMin: '',
+      salaryMax: '',
+      deadline: '',
+    });
+    setExcitement(3);
+    setResumeImage(null);
+    setResumeImagePublicId(null);
+    setPlatform('linkedin');
+    setErrors({});
+  }, [editingJob, isOpen]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};

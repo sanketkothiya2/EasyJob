@@ -39,6 +39,14 @@ export default function DashboardPage() {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [sortBy, setSortBy] = useState<'dateSaved' | 'company' | 'excitement'>('dateSaved');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const JOBS_PER_PAGE = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / JOBS_PER_PAGE));
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * JOBS_PER_PAGE,
+    currentPage * JOBS_PER_PAGE
+  );
 
   // Fetch jobs
   useEffect(() => {
@@ -86,6 +94,18 @@ export default function DashboardPage() {
 
     setFilteredJobs(result);
   }, [jobs, selectedStatus, searchQuery, sortBy, sortOrder]);
+
+  // Reset to first page when filters/sort/search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedStatus, searchQuery, sortBy, sortOrder]);
+
+  // Keep page number valid when list size changes
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const fetchJobs = async () => {
     try {
@@ -206,7 +226,10 @@ export default function DashboardPage() {
       {/* Header - Fixed */}
       <DashboardHeader
         userName={session?.user?.name || 'User'}
-        onAddJob={() => setIsAddModalOpen(true)}
+        onAddJob={() => {
+          setEditingJob(null);
+          setIsAddModalOpen(true);
+        }}
         onExport={() => setIsExportModalOpen(true)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -264,31 +287,83 @@ export default function DashboardPage() {
               {/* Scrollable Job List */}
               <div className="flex-1 overflow-y-auto pb-6 min-h-0 custom-scrollbar">
                 {filteredJobs.length > 0 ? (
-                  <JobTable
-                    jobs={filteredJobs}
-                    selectedJobId={selectedJob?._id}
-                    onSelectJob={(job: Job) => setSelectedJob(job)}
-                    onStatusChange={handleStatusChange}
-                    onDelete={handleDeleteJob}
-                    onEdit={(job: Job) => {
-                      setEditingJob(job);
-                      setIsAddModalOpen(true);
-                    }}
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={(field: 'dateSaved' | 'company' | 'excitement') => {
-                      if (sortBy === field) {
-                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                      } else {
-                        setSortBy(field);
-                        setSortOrder('desc');
-                      }
-                    }}
-                  />
+                  <>
+                    <JobTable
+                      jobs={paginatedJobs}
+                      selectedJobId={selectedJob?._id}
+                      onSelectJob={(job: Job) => setSelectedJob(job)}
+                      onStatusChange={handleStatusChange}
+                      onDelete={handleDeleteJob}
+                      onEdit={(job: Job) => {
+                        setEditingJob(job);
+                        setIsAddModalOpen(true);
+                      }}
+                      sortBy={sortBy}
+                      sortOrder={sortOrder}
+                      onSortChange={(field: 'dateSaved' | 'company' | 'excitement') => {
+                        if (sortBy === field) {
+                          setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                        } else {
+                          setSortBy(field);
+                          setSortOrder('desc');
+                        }
+                      }}
+                    />
+
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between mt-4 px-2">
+                        <p className="text-sm text-gray-500">
+                          Showing {(currentPage - 1) * JOBS_PER_PAGE + 1}-
+                          {Math.min(currentPage * JOBS_PER_PAGE, filteredJobs.length)} of {filteredJobs.length}
+                        </p>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                          >
+                            Prev
+                          </button>
+
+                          {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter((page) => Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages)
+                            .map((page, idx, arr) => (
+                              <div key={page} className="flex items-center gap-2">
+                                {idx > 0 && arr[idx - 1] !== page - 1 && (
+                                  <span className="text-gray-400">...</span>
+                                )}
+                                <button
+                                  onClick={() => setCurrentPage(page)}
+                                  className={`w-8 h-8 text-sm rounded-lg border transition-colors ${
+                                    currentPage === page
+                                      ? 'bg-pink-500 text-white border-pink-500'
+                                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              </div>
+                            ))}
+
+                          <button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <EmptyState
                     hasJobs={jobs.length > 0}
-                    onAddJob={() => setIsAddModalOpen(true)}
+                    onAddJob={() => {
+                      setEditingJob(null);
+                      setIsAddModalOpen(true);
+                    }}
                   />
                 )}
               </div>
