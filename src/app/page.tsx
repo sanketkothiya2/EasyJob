@@ -1,8 +1,9 @@
-import { Navbar, Hero, Features, HowItWorks, CTA, Footer } from '@/components/landing';
+import { AnimatedBackground, Navbar, Hero, Features, HowItWorks, CTA, Footer } from '@/components/landing';
 
 export default function Home() {
   return (
-    <main>
+    <main className="relative overflow-x-hidden">
+      <AnimatedBackground />
       <Navbar />
       <Hero />
       <Features />

@@ -35,10 +35,26 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-gray-600 hover:text-pink-600 transition-colors">
-              Features
+              <span className="relative inline-flex flex-col items-center">
+                Features
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
+                  className="origin-left mt-1 h-[2px] w-full bg-pink-500"
+                />
+              </span>
             </Link>
             <Link href="#how-it-works" className="text-gray-600 hover:text-pink-600 transition-colors">
-              How it Works
+              <span className="relative inline-flex flex-col items-center">
+                How it Works
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
+                  className="origin-left mt-1 h-[2px] w-full bg-pink-500"
+                />
+              </span>
             </Link>
             
             {session ? (
