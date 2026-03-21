@@ -36,6 +36,7 @@ export default function DashboardPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [sortBy, setSortBy] = useState<'dateSaved' | 'company' | 'excitement'>('dateSaved');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -103,19 +104,30 @@ export default function DashboardPage() {
 
   const handleAddJob = async (jobData: Partial<Job>) => {
     try {
-      const response = await fetch('/api/jobs', {
-        method: 'POST',
+      const isEditMode = !!editingJob;
+      const url = isEditMode ? `/api/jobs/${editingJob._id}` : '/api/jobs';
+      const method = isEditMode ? 'PATCH' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jobData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setJobs((prev) => [data.job, ...prev]);
+        if (isEditMode) {
+          setJobs((prev) =>
+            prev.map((job) => (job._id === editingJob._id ? data.job : job))
+          );
+          setEditingJob(null);
+        } else {
+          setJobs((prev) => [data.job, ...prev]);
+        }
         setIsAddModalOpen(false);
       }
     } catch (error) {
-      console.error('Error adding job:', error);
+      console.error('Error adding/editing job:', error);
     }
   };
 
@@ -258,6 +270,10 @@ export default function DashboardPage() {
                     onSelectJob={(job: Job) => setSelectedJob(job)}
                     onStatusChange={handleStatusChange}
                     onDelete={handleDeleteJob}
+                    onEdit={(job: Job) => {
+                      setEditingJob(job);
+                      setIsAddModalOpen(true);
+                    }}
                     sortBy={sortBy}
                     sortOrder={sortOrder}
                     onSortChange={(field: 'dateSaved' | 'company' | 'excitement') => {
@@ -298,8 +314,12 @@ export default function DashboardPage() {
       {/* Add Job Modal */}
       <AddJobModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingJob(null);
+        }}
         onSubmit={handleAddJob}
+        editingJob={editingJob}
       />
 
       {/* Export Modal */}

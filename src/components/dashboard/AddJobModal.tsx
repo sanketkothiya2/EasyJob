@@ -49,36 +49,39 @@ interface AddJobModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: Partial<Job>) => void;
+  editingJob?: Job | null;
 }
 
 export default function AddJobModal({
   isOpen,
   onClose,
   onSubmit,
+  editingJob,
 }: AddJobModalProps) {
-  const [excitement, setExcitement] = useState(3);
+  const isEditing = !!editingJob;
+  const [excitement, setExcitement] = useState(editingJob?.excitement || 3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    company: '',
-    location: '',
-    url: '',
-    description: '',
-    salaryMin: '',
-    salaryMax: '',
-    deadline: '',
+    title: editingJob?.title || '',
+    company: editingJob?.company || '',
+    location: editingJob?.location || '',
+    url: editingJob?.url || '',
+    description: editingJob?.description || '',
+    salaryMin: editingJob?.salary?.min ? String(editingJob.salary.min) : '',
+    salaryMax: editingJob?.salary?.max ? String(editingJob.salary.max) : '',
+    deadline: editingJob?.deadline ? new Date(editingJob.deadline).toISOString().split('T')[0] : '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   // Resume image state
-  const [resumeImage, setResumeImage] = useState<string | null>(null);
-  const [resumeImagePublicId, setResumeImagePublicId] = useState<string | null>(null);
+  const [resumeImage, setResumeImage] = useState<string | null>(editingJob?.resumeImage || null);
+  const [resumeImagePublicId, setResumeImagePublicId] = useState<string | null>(editingJob?.resumeImagePublicId || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Platform state
-  const [platform, setPlatform] = useState<JobPlatform>('linkedin');
+  const [platform, setPlatform] = useState<JobPlatform>(editingJob?.platform || 'linkedin');
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
 
   const validateForm = () => {
@@ -189,7 +192,6 @@ export default function AddJobModal({
       location: formData.location,
       url: formData.url || undefined,
       description: formData.description || undefined,
-      status: 'bookmarked',
       excitement,
       platform,
       resumeImage: resumeImage || undefined,
@@ -203,6 +205,11 @@ export default function AddJobModal({
           : undefined,
       deadline: formData.deadline ? new Date(formData.deadline) : undefined,
     };
+
+    // Only set status for new jobs
+    if (!isEditing) {
+      jobData.status = 'bookmarked';
+    }
 
     await onSubmit(jobData);
     setIsSubmitting(false);
@@ -261,7 +268,7 @@ export default function AddJobModal({
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-500 to-rose-500 flex-shrink-0">
-              <h2 className="text-xl font-semibold text-white">Add New Job</h2>
+              <h2 className="text-xl font-semibold text-white">{isEditing ? 'Edit Job' : 'Add New Job'}</h2>
               <button
                 onClick={handleClose}
                 className="p-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"

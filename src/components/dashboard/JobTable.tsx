@@ -14,6 +14,7 @@ import {
   Eye,
   Archive,
   Copy,
+  Edit2,
 } from 'lucide-react';
 import { Job, JobStatus } from '@/types';
 import StatusDropdown from '@/components/ui/StatusDropdown';
@@ -25,6 +26,7 @@ interface JobTableProps {
   onSelectJob: (job: Job) => void;
   onStatusChange: (jobId: string, status: JobStatus) => void;
   onDelete: (jobId: string) => void;
+  onEdit: (job: Job) => void;
   sortBy: 'dateSaved' | 'company' | 'excitement';
   sortOrder: 'asc' | 'desc';
   onSortChange: (field: 'dateSaved' | 'company' | 'excitement') => void;
@@ -36,6 +38,7 @@ export default function JobTable({
   onSelectJob,
   onStatusChange,
   onDelete,
+  onEdit,
   sortBy,
   sortOrder,
   onSortChange,
@@ -210,6 +213,17 @@ export default function JobTable({
                         >
                           <Eye className="w-4 h-4" />
                           <span>View Details</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            onEdit(job);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                          <span>Edit Job</span>
                         </button>
                         {job.url && (
                           <button
