@@ -63,6 +63,9 @@ export default function TasksPage() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [filterPriority, setFilterPriority] = useState<FilterPriority>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const TASKS_PER_PAGE = 10;
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -101,6 +104,10 @@ export default function TasksPage() {
     fetchTasks();
     fetchJobs();
   }, [fetchTasks]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterCategory, filterStatus, filterPriority, viewMode]);
 
   const handleSaveTask = async (taskData: Partial<Task>) => {
     try {
@@ -214,18 +221,12 @@ export default function TasksPage() {
     }
   };
 
-  const todayTasks = tasks.filter((task) => {
-    if (!task.dueDate) return false;
-    const today = new Date();
-    const dueDate = new Date(task.dueDate);
-    return (
-      dueDate.getDate() === today.getDate() &&
-      dueDate.getMonth() === today.getMonth() &&
-      dueDate.getFullYear() === today.getFullYear()
-    );
-  });
-
   const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+  const totalTaskPages = Math.max(1, Math.ceil(tasks.length / TASKS_PER_PAGE));
+  const paginatedTasks = tasks.slice(
+    (currentPage - 1) * TASKS_PER_PAGE,
+    currentPage * TASKS_PER_PAGE
+  );
 
   const statCards = [
     {
@@ -399,6 +400,24 @@ export default function TasksPage() {
             </button>
           </div>
 
+          {/* Quick Category Filters */}
+          <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+            <span className="text-sm text-gray-500 mr-2">Quick Filter:</span>
+            {(['all', 'daily', 'weekly', 'monthly'] as const).map((category) => (
+              <button
+                key={category}
+                onClick={() => setFilterCategory(category)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  filterCategory === category
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}
+              </button>
+            ))}
+          </div>
+
           {/* Filter Options */}
           <AnimatePresence>
             {showFilters && (
@@ -456,53 +475,7 @@ export default function TasksPage() {
 
         {/* Dashboard View */}
         {viewMode === 'dashboard' && (
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Today's Tasks */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-5 border-b border-gray-100">
-                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-orange-500" />
-                    Today&apos;s Tasks
-                    <span className="ml-auto text-sm font-normal text-gray-500">
-                      {todayTasks.length} tasks
-                    </span>
-                  </h2>
-                </div>
-                <div className="p-5 space-y-4">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <RefreshCw className="w-8 h-8 animate-spin text-pink-500" />
-                    </div>
-                  ) : todayTasks.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>No tasks due today</p>
-                      <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="mt-4 text-pink-500 hover:text-pink-600 font-medium"
-                      >
-                        Add your first task
-                      </button>
-                    </div>
-                  ) : (
-                    todayTasks.map((task) => (
-                      <TaskCard
-                        key={task._id}
-                        task={task}
-                        onToggleStatus={() => handleToggleStatus(task)}
-                        onEdit={() => handleEditTask(task)}
-                        onDelete={() => handleDeleteTask(task._id)}
-                        onToggleSubtask={(subtaskId) => handleToggleSubtask(task, subtaskId)}
-                        compact
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats & Recent */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
             <div className="space-y-6">
               {/* Overdue Tasks */}
               {stats.overdue > 0 && (
@@ -516,34 +489,45 @@ export default function TasksPage() {
                 </div>
               )}
 
-              {/* Categories Breakdown */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Tasks by Category</h3>
-                <div className="space-y-3">
-                  {(['daily', 'weekly', 'monthly'] as TaskCategory[]).map((cat) => {
-                    const count = tasks.filter((t) => t.category === cat).length;
-                    const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
-                    const colors = {
-                      daily: 'bg-purple-500',
-                      weekly: 'bg-blue-500',
-                      monthly: 'bg-pink-500',
-                    };
-                    return (
-                      <div key={cat}>
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-gray-600 capitalize">{cat}</span>
-                          <span className="font-medium text-gray-900">{count}</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-2">
-                          <div
-                            className={`${colors[cat]} h-2 rounded-full transition-all`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+              {stats.overdue === 0 && (
+                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+                  <h3 className="font-semibold text-green-700 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Overdue Tasks
+                  </h3>
+                  <p className="text-3xl font-bold text-green-600 mt-2">0</p>
+                  <p className="text-sm text-green-500 mt-1">You are all caught up</p>
                 </div>
+              )}
+            </div>
+
+            {/* Categories Breakdown */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Tasks by Category</h3>
+              <div className="space-y-3">
+                {(['daily', 'weekly', 'monthly'] as TaskCategory[]).map((cat) => {
+                  const count = tasks.filter((t) => t.category === cat).length;
+                  const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+                  const colors = {
+                    daily: 'bg-purple-500',
+                    weekly: 'bg-blue-500',
+                    monthly: 'bg-pink-500',
+                  };
+                  return (
+                    <div key={cat}>
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-gray-600 capitalize">{cat}</span>
+                        <span className="font-medium text-gray-900">{count}</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2">
+                        <div
+                          className={`${colors[cat]} h-2 rounded-full transition-all`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -562,7 +546,7 @@ export default function TasksPage() {
                   </span>
                 </h2>
               </div>
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-4 max-h-[760px] overflow-y-auto custom-scrollbar">
                 {isLoading ? (
                   <div className="flex items-center justify-center py-12">
                     <RefreshCw className="w-8 h-8 animate-spin text-pink-500" />
@@ -579,7 +563,7 @@ export default function TasksPage() {
                     </button>
                   </div>
                 ) : (
-                  tasks.map((task) => (
+                  paginatedTasks.map((task) => (
                     <TaskCard
                       key={task._id}
                       task={task}
@@ -591,6 +575,34 @@ export default function TasksPage() {
                   ))
                 )}
               </div>
+
+              {!isLoading && tasks.length > 0 && totalTaskPages > 1 && (
+                <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
+                  <p className="text-sm text-gray-500">
+                    Showing {(currentPage - 1) * TASKS_PER_PAGE + 1}-
+                    {Math.min(currentPage * TASKS_PER_PAGE, tasks.length)} of {tasks.length}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    >
+                      Prev
+                    </button>
+                    <span className="text-sm text-gray-600">
+                      Page {currentPage} of {totalTaskPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalTaskPages))}
+                      disabled={currentPage === totalTaskPages}
+                      className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
